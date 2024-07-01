@@ -1,9 +1,9 @@
 package postgres
 
 import (
+	"community-service/config"
 	"database/sql"
 	"fmt"
-	"community_service/config"
 
 	_ "github.com/lib/pq"
 )
