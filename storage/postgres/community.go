@@ -17,7 +17,7 @@ func NewCommunityRepo(db *sql.DB) *CommunityRepo {
 
 func (c *CommunityRepo) CreateCommunity(in *pb.CreateCommunityRequest) (*pb.CreateCommunityResponse, error) {
 	rows, err := c.DB.Exec(`
-			INSERS INTO
+			INSERT INTO
 			communities(
 				name,
 				description,
@@ -148,9 +148,9 @@ func (c *CommunityRepo) ListCommunities(in *pb.ListCommunitiesRequest) (*pb.List
 
 func (c *CommunityRepo) JoinCommunity(in *pb.JoinCommunityRequest) (*pb.JoinCommunityResponse, error) {
 	rows, err := c.DB.Exec(`
-			INSETR INTO
+			INSERT INTO
 			community_members(
-				communityi_id,
+				community_id,
 				user_id)
 			VALUES(
 				$1,
@@ -172,7 +172,7 @@ func (c *CommunityRepo) LeaveCommunity(in *pb.LeaveCommunityRequest) (*pb.LeaveC
 			UPDATE 
 			community_members
 			SET
-			deleted_at=date_part('epoch', current_timestamp)::INT 
+			deleted_ad=date_part('epoch', current_timestamp)::INT 
 			WHERE community_id=$1
 			`, in.CommunityId)
 
@@ -192,15 +192,15 @@ func (c *CommunityRepo) LeaveCommunity(in *pb.LeaveCommunityRequest) (*pb.LeaveC
 func (c *CommunityRepo) CreateCommunityEvent(in *pb.CreateCommunityEventRequest) (*pb.CreateCommunityEventResponse, error) {
 
 	rows, err := c.DB.Exec(`
-			INSETR INTO
+			INSERT INTO
 			events(
 				id,
 				community_id,
 				name,
 				description,
 				type,
-				start_type,
-				end_type,
+				start_time,
+				end_time,
 				location)
 			VALUES(
 				$1,
@@ -230,8 +230,8 @@ func (c *CommunityRepo) ListCommunityEvents(in *pb.ListCommunityEventsRequest) (
 				name,
 				description,
 				type,
-				start_type,
-				end_type,
+				start_time,
+				end_time,
 				location
 			FROM events
 			WHERE
@@ -259,7 +259,7 @@ func (c *CommunityRepo) ListCommunityEvents(in *pb.ListCommunityEventsRequest) (
 }
 func (c *CommunityRepo) CreateCommunityForumPost(in *pb.CreateCommunityForumPostRequest) (*pb.CreateCommunityForumPostRespnse, error) {
 	rows, err := c.DB.Exec(`
-			INSETR INTO
+			INSERT INTO
 			forum_posts(
 				id,
 				community_id,
@@ -292,8 +292,8 @@ func (c *CommunityRepo) ListCommunityForumPosts(in *pb.ListCommunityForumPostsRe
 				id,
 				user_id,
 				title,
-				content,
-			FROM form_post
+				content
+			FROM forum_posts
 			WHERE
 				community_id=$1
 			`, in.ComunityId)
@@ -321,7 +321,7 @@ func (c *CommunityRepo) ListCommunityForumPosts(in *pb.ListCommunityForumPostsRe
 func (c *CommunityRepo) AddForumPostComment(in *pb.AddForumPostCommentRequest) (*pb.AddForumPostCommentResponse, error) {
 
 	rows, err := c.DB.Exec(`
-			INSETR INTO
+			INSERT INTO
 			forum_comments(
 				id,
 				post_id,
