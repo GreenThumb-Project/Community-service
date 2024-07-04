@@ -4,20 +4,19 @@ import (
 	pb "community-service/generated/community"
 	"community-service/pkg"
 	"database/sql"
-	"fmt"
 )
 
 type CommunityRepo struct {
 	DB *sql.DB
 }
 
-func NewCommunityRepo(db *sql.DB) *CommunityRepo  {
+func NewCommunityRepo(db *sql.DB) *CommunityRepo {
 	return &CommunityRepo{DB: db}
 }
 
 func (c *CommunityRepo) CreateCommunity(in *pb.CreateCommunityRequest) (*pb.CreateCommunityResponse, error) {
 	rows, err := c.DB.Exec(`
-			INSERS INTO
+			INSERT INTO
 			communities(
 				name,
 				description,
@@ -81,14 +80,9 @@ func (c *CommunityRepo) UpdateCommunity(in *pb.UpdateCommunityRequest) (*pb.Upda
 	params["id"] = in.Id
 	query, args := pkg.ReplaceQueryParams(query, params)
 
-	res, err := c.DB.Exec(query, args...)
+	_, err := c.DB.Exec(query, args...)
 	if err != nil {
 		return nil, err
-	}
-
-	rowsAffected, _ := res.RowsAffected()
-	if rowsAffected == 0 {
-		return &pb.UpdateCommunityResponse{Succses: false}, fmt.Errorf("no rows affected, user with id %s not found", in.Id)
 	}
 
 	return &pb.UpdateCommunityResponse{Succses: true}, nil
@@ -96,22 +90,16 @@ func (c *CommunityRepo) UpdateCommunity(in *pb.UpdateCommunityRequest) (*pb.Upda
 }
 
 func (c *CommunityRepo) DeleteCommunity(in *pb.DeleteCommunityRequest) (*pb.DeleteCommunityResponse, error) {
-	rows, err := c.DB.Exec(`
+	_, err := c.DB.Exec(`
 			UPDATE
 				communities
-			SET de
-				deleted_ad=date_part('epoch', current_timestamp)::INT 
+			SET
+				deleted_at=date_part('epoch', current_timestamp)::INT 
 			WHERE
 				id=$1
 		`, in.Id)
 
 	if err != nil {
-		return &pb.DeleteCommunityResponse{Succses: false}, err
-	}
-
-	rowsAffected, err := rows.RowsAffected()
-
-	if err != nil || rowsAffected == 0 {
 		return &pb.DeleteCommunityResponse{Succses: false}, err
 	}
 
@@ -124,9 +112,10 @@ func (c *CommunityRepo) ListCommunities(in *pb.ListCommunitiesRequest) (*pb.List
 			SELECT
 				name,
 				description,
-				location,
+				location
 			FROM
 			communities
+			where deleted_at=0
 			`)
 
 	if err != nil {
@@ -154,32 +143,31 @@ func (c *CommunityRepo) LeaveCommunity(in *pb.LeaveCommunityRequest) (*pb.LeaveC
 	return nil, nil
 }
 
-func (c *CommunityRepo) CreateCommunityEvent(in *pb.CreateCommunityEventRequest) (*pb.CreateCommunityEventResponse,error) {
+func (c *CommunityRepo) CreateCommunityEvent(in *pb.CreateCommunityEventRequest) (*pb.CreateCommunityEventResponse, error) {
 	return nil, nil
 
 }
 
-
-func (c *CommunityRepo) ListCommunityEvents(in *pb.ListCommunityEventsRequest) (*pb.ListCommunityEventsResponse,error) {
+func (c *CommunityRepo) ListCommunityEvents(in *pb.ListCommunityEventsRequest) (*pb.ListCommunityEventsResponse, error) {
 	return nil, nil
 
 }
-func (c *CommunityRepo) CreateCommunityForumPost(in *pb.CreateCommunityForumPostRequest) (*pb.CreateCommunityForumPostRespnse,error) {
-	return nil, nil
-
-}
-
-func (c *CommunityRepo) ListCommunityForumPosts(in *pb.ListCommunityForumPostsRequest) (*pb.ListCommunityForumPostsResponse,error) {
+func (c *CommunityRepo) CreateCommunityForumPost(in *pb.CreateCommunityForumPostRequest) (*pb.CreateCommunityForumPostRespnse, error) {
 	return nil, nil
 
 }
 
-func (c *CommunityRepo) AddForumPostComment(in *pb.AddForumPostCommentRequest) (*pb.AddForumPostCommentResponse,error) {
+func (c *CommunityRepo) ListCommunityForumPosts(in *pb.ListCommunityForumPostsRequest) (*pb.ListCommunityForumPostsResponse, error) {
 	return nil, nil
 
 }
 
-func (c *CommunityRepo) ListForumPostComments(in *pb.ListForumPostCommentsRequest) (*pb.ListForumPostCommentsResponse,error) {
+func (c *CommunityRepo) AddForumPostComment(in *pb.AddForumPostCommentRequest) (*pb.AddForumPostCommentResponse, error) {
+	return nil, nil
+
+}
+
+func (c *CommunityRepo) ListForumPostComments(in *pb.ListForumPostCommentsRequest) (*pb.ListForumPostCommentsResponse, error) {
 	return nil, nil
 
 }

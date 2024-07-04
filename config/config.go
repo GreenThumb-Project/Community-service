@@ -25,12 +25,12 @@ func Load() Config {
 
 	config := Config{}
 
-	config.HTTP_PORT = cast.ToString(coalesce("HHTP_PORT", ":8080"))
+	config.HTTP_PORT = cast.ToString(coalesce("HTTP_PORT", ":8080"))
 
 	config.DB_HOST = cast.ToString(coalesce("DB_HOST", "localhost"))
 	config.DB_PORT = cast.ToInt(coalesce("DB_PORT", 5432))
 	config.DB_USER = cast.ToString(coalesce("DB_USER", "postgres"))
-	config.DB_NAME = cast.ToString(coalesce("DB_NAME", "postgres"))
+	config.DB_NAME = cast.ToString(coalesce("DB_NAME", "community"))
 	config.DB_PASSWORD = cast.ToString(coalesce("DB_PASSWORD", "03212164"))
 
 	return config
