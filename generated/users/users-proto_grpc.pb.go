@@ -26,6 +26,7 @@ type UserManagementClient interface {
 	CreateUser(ctx context.Context, in *CreateUsersRequest, opts ...grpc.CallOption) (*CreateUsersResponce, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponce, error)
 	GetUserByIdProfile(ctx context.Context, in *GetUserByIdProfileRequest, opts ...grpc.CallOption) (*GetUserByIdProfileResponces, error)
+	CreateUserProfile(ctx context.Context, in *CreateProfileUsersRequest, opts ...grpc.CallOption) (*CreateProfileUsersResponce, error)
 	UpdateUserProfile(ctx context.Context, in *UpdateUserProfileRequest, opts ...grpc.CallOption) (*UpdateUserProfileResponces, error)
 }
 
@@ -73,6 +74,15 @@ func (c *userManagementClient) GetUserByIdProfile(ctx context.Context, in *GetUs
 	return out, nil
 }
 
+func (c *userManagementClient) CreateUserProfile(ctx context.Context, in *CreateProfileUsersRequest, opts ...grpc.CallOption) (*CreateProfileUsersResponce, error) {
+	out := new(CreateProfileUsersResponce)
+	err := c.cc.Invoke(ctx, "/users.UserManagement/CreateUserProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userManagementClient) UpdateUserProfile(ctx context.Context, in *UpdateUserProfileRequest, opts ...grpc.CallOption) (*UpdateUserProfileResponces, error) {
 	out := new(UpdateUserProfileResponces)
 	err := c.cc.Invoke(ctx, "/users.UserManagement/UpdateUserProfile", in, out, opts...)
@@ -90,6 +100,7 @@ type UserManagementServer interface {
 	CreateUser(context.Context, *CreateUsersRequest) (*CreateUsersResponce, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponce, error)
 	GetUserByIdProfile(context.Context, *GetUserByIdProfileRequest) (*GetUserByIdProfileResponces, error)
+	CreateUserProfile(context.Context, *CreateProfileUsersRequest) (*CreateProfileUsersResponce, error)
 	UpdateUserProfile(context.Context, *UpdateUserProfileRequest) (*UpdateUserProfileResponces, error)
 	mustEmbedUnimplementedUserManagementServer()
 }
@@ -109,6 +120,9 @@ func (UnimplementedUserManagementServer) DeleteUser(context.Context, *DeleteUser
 }
 func (UnimplementedUserManagementServer) GetUserByIdProfile(context.Context, *GetUserByIdProfileRequest) (*GetUserByIdProfileResponces, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByIdProfile not implemented")
+}
+func (UnimplementedUserManagementServer) CreateUserProfile(context.Context, *CreateProfileUsersRequest) (*CreateProfileUsersResponce, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserProfile not implemented")
 }
 func (UnimplementedUserManagementServer) UpdateUserProfile(context.Context, *UpdateUserProfileRequest) (*UpdateUserProfileResponces, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserProfile not implemented")
@@ -198,6 +212,24 @@ func _UserManagement_GetUserByIdProfile_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserManagement_CreateUserProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProfileUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserManagementServer).CreateUserProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/users.UserManagement/CreateUserProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserManagementServer).CreateUserProfile(ctx, req.(*CreateProfileUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserManagement_UpdateUserProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserProfileRequest)
 	if err := dec(in); err != nil {
@@ -238,6 +270,10 @@ var UserManagement_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserByIdProfile",
 			Handler:    _UserManagement_GetUserByIdProfile_Handler,
+		},
+		{
+			MethodName: "CreateUserProfile",
+			Handler:    _UserManagement_CreateUserProfile_Handler,
 		},
 		{
 			MethodName: "UpdateUserProfile",
