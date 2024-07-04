@@ -7,7 +7,7 @@ import (
 )
 
 type CommunityServer struct {
-	pb.UnimplementedComunityCserviceServer
+	pb.UnimplementedComunityServiceServer
 	Community *postgres.CommunityRepo
 }
 

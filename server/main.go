@@ -32,7 +32,7 @@ func main() {
 		Community: postgres.NewCommunityRepo(db),
 	}
 
-	pb.RegisterComunityCserviceServer(s, &community)
+	pb.RegisterComunityServiceServer(s, &community)
 
 	log.Println("server is running on :50053 ...")
 
