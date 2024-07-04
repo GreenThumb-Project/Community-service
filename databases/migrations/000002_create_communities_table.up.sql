@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS communities (
     description TEXT,
     location VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_ad TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    deleted_ad BIGINT
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at BIGINT default 0
 );
