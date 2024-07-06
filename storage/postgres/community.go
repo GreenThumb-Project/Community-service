@@ -120,30 +120,68 @@ func (c *CommunityRepo) DeleteCommunity(in *pb.DeleteCommunityRequest) (*pb.Dele
 }
 
 func (c *CommunityRepo) ListCommunities(in *pb.ListCommunitiesRequest) (*pb.ListCommunitiesResponse, error) {
-	rows, err := c.DB.Query(`
-			SELECT
-				name,
-				description,
-				location,
-			FROM
-			communities
-			`)
 
+	var (
+		params = make(map[string]interface{})
+		arr    []interface{}
+		filter string
+	)
+
+	query := `SELECT name, description,location
+	FROM communities WHERE true `
+
+	if len(in.Name) > 0 {
+		params["name"] = in.Name
+		filter += " and name = :name "
+	}
+
+	if in.Description != "" {
+		params["Description"] = in.Description
+		filter += " and Description = :Description "
+	}
+
+	if in.Location != "" {
+		params["lacation"] = in.Location
+		filter += " and location = :location "
+	}
+
+	if in.Offset > 0 {
+		params["offset"] = in.Offset
+		filter += " OFFSET :offset"
+	}
+
+	if in.Limit > 0 {
+		params["limit"] = in.Limit
+		filter += " LIMIT :limit"
+	}
+	query = query + filter
+
+	query, arr = pkg.ReplaceQueryParams(query, params)
+	fmt.Println(query, arr)
+	rows, err := c.DB.Query(query, arr...)
+	fmt.Println(err, query)
 	if err != nil {
 		return nil, err
 	}
-	var community pb.Comunity
-	var communities []*pb.Comunity
+
+	var cpmmunityes []*pb.Comunity
 	for rows.Next() {
-		err = rows.Scan(&community.Name, &community.Description, &community.Location)
+		var community pb.Comunity
+		err := rows.Scan(&community.Name, &community.Description, &community.Location)
+
 		if err != nil {
 			return nil, err
 		}
 
-		communities = append(communities, &community)
+		cpmmunityes = append(cpmmunityes, &community)
 	}
 
-	return &pb.ListCommunitiesResponse{Comunitys: communities}, nil
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &pb.ListCommunitiesResponse{Comunitys: cpmmunityes}, nil
+
 }
 
 func (c *CommunityRepo) JoinCommunity(in *pb.JoinCommunityRequest) (*pb.JoinCommunityResponse, error) {

@@ -105,15 +105,19 @@ func TestListCommunity(t *testing.T) {
 		panic(err)
 	}
 	community := NewCommunityRepo(db)
-	reslist, err := community.ListCommunities(&pb.ListCommunitiesRequest{})
+	reslist, err := community.ListCommunities(&pb.ListCommunitiesRequest{
+		Name: "Community_14",
+		Limit: 1,
+		Offset: 0,
+	})
 	if err != nil {
 		fmt.Println(err)
 	}
 	waitlist := pb.ListCommunitiesResponse{
 		Comunitys: []*pb.Comunity{
-			{Name: "NurMel",
-				Description: "Any1",
-				Location:    "Tashkent",
+			{Name: "Community_14",
+				Description: "This is the description for Community_14.",
+				Location:    "Location_100",
 			},
 		},
 	}
