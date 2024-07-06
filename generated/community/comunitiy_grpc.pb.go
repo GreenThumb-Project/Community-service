@@ -35,6 +35,7 @@ type ComunityServiceClient interface {
 	ListCommunityForumPosts(ctx context.Context, in *ListCommunityForumPostsRequest, opts ...grpc.CallOption) (*ListCommunityForumPostsResponse, error)
 	AddForumPostComment(ctx context.Context, in *AddForumPostCommentRequest, opts ...grpc.CallOption) (*AddForumPostCommentResponse, error)
 	ListForumPostComments(ctx context.Context, in *ListForumPostCommentsRequest, opts ...grpc.CallOption) (*ListForumPostCommentsResponse, error)
+	CommunityMembers(ctx context.Context, in *CommunityMembersRequest, opts ...grpc.CallOption) (*CommunityMembersResponse, error)
 }
 
 type comunityServiceClient struct {
@@ -162,6 +163,15 @@ func (c *comunityServiceClient) ListForumPostComments(ctx context.Context, in *L
 	return out, nil
 }
 
+func (c *comunityServiceClient) CommunityMembers(ctx context.Context, in *CommunityMembersRequest, opts ...grpc.CallOption) (*CommunityMembersResponse, error) {
+	out := new(CommunityMembersResponse)
+	err := c.cc.Invoke(ctx, "/comunity.ComunityService/CommunityMembers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ComunityServiceServer is the server API for ComunityService service.
 // All implementations must embed UnimplementedComunityServiceServer
 // for forward compatibility
@@ -179,6 +189,7 @@ type ComunityServiceServer interface {
 	ListCommunityForumPosts(context.Context, *ListCommunityForumPostsRequest) (*ListCommunityForumPostsResponse, error)
 	AddForumPostComment(context.Context, *AddForumPostCommentRequest) (*AddForumPostCommentResponse, error)
 	ListForumPostComments(context.Context, *ListForumPostCommentsRequest) (*ListForumPostCommentsResponse, error)
+	CommunityMembers(context.Context, *CommunityMembersRequest) (*CommunityMembersResponse, error)
 	mustEmbedUnimplementedComunityServiceServer()
 }
 
@@ -224,6 +235,9 @@ func (UnimplementedComunityServiceServer) AddForumPostComment(context.Context, *
 }
 func (UnimplementedComunityServiceServer) ListForumPostComments(context.Context, *ListForumPostCommentsRequest) (*ListForumPostCommentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListForumPostComments not implemented")
+}
+func (UnimplementedComunityServiceServer) CommunityMembers(context.Context, *CommunityMembersRequest) (*CommunityMembersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CommunityMembers not implemented")
 }
 func (UnimplementedComunityServiceServer) mustEmbedUnimplementedComunityServiceServer() {}
 
@@ -472,6 +486,24 @@ func _ComunityService_ListForumPostComments_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ComunityService_CommunityMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommunityMembersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ComunityServiceServer).CommunityMembers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/comunity.ComunityService/CommunityMembers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ComunityServiceServer).CommunityMembers(ctx, req.(*CommunityMembersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ComunityService_ServiceDesc is the grpc.ServiceDesc for ComunityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -530,6 +562,10 @@ var ComunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListForumPostComments",
 			Handler:    _ComunityService_ListForumPostComments_Handler,
+		},
+		{
+			MethodName: "CommunityMembers",
+			Handler:    _ComunityService_CommunityMembers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

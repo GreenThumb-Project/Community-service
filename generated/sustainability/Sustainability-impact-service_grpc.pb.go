@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type SustainabilityimpactServiceClient interface {
 	LogImpact(ctx context.Context, in *LogImpactRequest, opts ...grpc.CallOption) (*LogImpactResponse, error)
 	GetUserImpact(ctx context.Context, in *GetUserImpactRequest, opts ...grpc.CallOption) (*GetUserImpactResponse, error)
+	CreateSustainability(ctx context.Context, in *CreateSustainabilityRequest, opts ...grpc.CallOption) (*CreateSustainabilityResponse, error)
 	GetCommunityImpact(ctx context.Context, in *GetCommunityImpactRequest, opts ...grpc.CallOption) (*GetCommunityImpactResponse, error)
 	GetChallenges(ctx context.Context, in *GetChallengesRequest, opts ...grpc.CallOption) (*GetChallengesResponse, error)
 	JoinChallenge(ctx context.Context, in *JoinChallengeRequest, opts ...grpc.CallOption) (*JoinChallengeResponse, error)
@@ -53,6 +54,15 @@ func (c *sustainabilityimpactServiceClient) LogImpact(ctx context.Context, in *L
 func (c *sustainabilityimpactServiceClient) GetUserImpact(ctx context.Context, in *GetUserImpactRequest, opts ...grpc.CallOption) (*GetUserImpactResponse, error) {
 	out := new(GetUserImpactResponse)
 	err := c.cc.Invoke(ctx, "/SustainabilityImpactService.SustainabilityimpactService/GetUserImpact", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sustainabilityimpactServiceClient) CreateSustainability(ctx context.Context, in *CreateSustainabilityRequest, opts ...grpc.CallOption) (*CreateSustainabilityResponse, error) {
+	out := new(CreateSustainabilityResponse)
+	err := c.cc.Invoke(ctx, "/SustainabilityImpactService.SustainabilityimpactService/CreateSustainability", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +138,7 @@ func (c *sustainabilityimpactServiceClient) GetCommunitiesLeaderboard(ctx contex
 type SustainabilityimpactServiceServer interface {
 	LogImpact(context.Context, *LogImpactRequest) (*LogImpactResponse, error)
 	GetUserImpact(context.Context, *GetUserImpactRequest) (*GetUserImpactResponse, error)
+	CreateSustainability(context.Context, *CreateSustainabilityRequest) (*CreateSustainabilityResponse, error)
 	GetCommunityImpact(context.Context, *GetCommunityImpactRequest) (*GetCommunityImpactResponse, error)
 	GetChallenges(context.Context, *GetChallengesRequest) (*GetChallengesResponse, error)
 	JoinChallenge(context.Context, *JoinChallengeRequest) (*JoinChallengeResponse, error)
@@ -147,6 +158,9 @@ func (UnimplementedSustainabilityimpactServiceServer) LogImpact(context.Context,
 }
 func (UnimplementedSustainabilityimpactServiceServer) GetUserImpact(context.Context, *GetUserImpactRequest) (*GetUserImpactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserImpact not implemented")
+}
+func (UnimplementedSustainabilityimpactServiceServer) CreateSustainability(context.Context, *CreateSustainabilityRequest) (*CreateSustainabilityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSustainability not implemented")
 }
 func (UnimplementedSustainabilityimpactServiceServer) GetCommunityImpact(context.Context, *GetCommunityImpactRequest) (*GetCommunityImpactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCommunityImpact not implemented")
@@ -215,6 +229,24 @@ func _SustainabilityimpactService_GetUserImpact_Handler(srv interface{}, ctx con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SustainabilityimpactServiceServer).GetUserImpact(ctx, req.(*GetUserImpactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SustainabilityimpactService_CreateSustainability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSustainabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SustainabilityimpactServiceServer).CreateSustainability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SustainabilityImpactService.SustainabilityimpactService/CreateSustainability",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SustainabilityimpactServiceServer).CreateSustainability(ctx, req.(*CreateSustainabilityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -359,6 +391,10 @@ var SustainabilityimpactService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserImpact",
 			Handler:    _SustainabilityimpactService_GetUserImpact_Handler,
+		},
+		{
+			MethodName: "CreateSustainability",
+			Handler:    _SustainabilityimpactService_CreateSustainability_Handler,
 		},
 		{
 			MethodName: "GetCommunityImpact",

@@ -20,7 +20,7 @@ func main() {
 
 	defer db.Close()
 
-	listener, err := net.Listen("tcp", ":50053")
+	listener, err := net.Listen("tcp", ":50052")
 
 	if err != nil {
 		log.Fatal(err)
@@ -34,7 +34,7 @@ func main() {
 
 	pb.RegisterComunityServiceServer(s, &community)
 
-	log.Println("server is running on :50053 ...")
+	log.Printf("server is running on %v...", listener.Addr())
 
 	if err = s.Serve(listener); err != nil {
 		log.Fatal(err)

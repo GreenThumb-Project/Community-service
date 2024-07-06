@@ -157,9 +157,9 @@ func (c *CommunityRepo) ListCommunities(in *pb.ListCommunitiesRequest) (*pb.List
 	query = query + filter
 
 	query, arr = pkg.ReplaceQueryParams(query, params)
-	fmt.Println(query, arr)
+
 	rows, err := c.DB.Query(query, arr...)
-	fmt.Println(err, query)
+
 	if err != nil {
 		return nil, err
 	}
@@ -208,11 +208,12 @@ func (c *CommunityRepo) LeaveCommunity(in *pb.LeaveCommunityRequest) (*pb.LeaveC
 
 	row, err := c.DB.Exec(`
 			UPDATE 
-			community_members
+				community_members
 			SET
-			deleted_ad=date_part('epoch', current_timestamp)::INT 
-			WHERE community_id=$1
-			`, in.CommunityId)
+				deleted_ad=date_part('epoch', current_timestamp)::INT 
+			WHERE 
+				community_id=$1 AND user_id = $2
+			`, in.CommunityId, in.UserId)
 
 	if err != nil {
 		return &pb.LeaveCommunityResponse{Success: false}, err
@@ -413,4 +414,36 @@ func (c *CommunityRepo) ListForumPostComments(in *pb.ListForumPostCommentsReques
 
 	return &pb.ListForumPostCommentsResponse{ListForumPostComments: listForumPostComments}, nil
 
+}
+
+func (c *CommunityRepo) GetCommunityMembers(community_id string) (*pb.CommunityMembersResponse, error) {
+	rows, err := c.DB.Query(`
+		SELECT 
+			user_id
+		FROM
+			community_members as cm
+		JOIN 
+			communities as c 
+		ON c.id=cm.community_id
+		WHERE 
+			c.deleted_at=0 and cm.deleted_ad is null and c.id=$1
+	`, community_id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var members []string
+
+	for rows.Next() {
+		var member string
+
+		if err := rows.Scan(&member); err != nil {
+			return nil, err
+		}
+
+		members = append(members, member)
+	}
+
+	return &pb.CommunityMembersResponse{Members: members}, nil
 }

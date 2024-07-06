@@ -130,4 +130,12 @@ func (c *CommunityServer) ListForumPostComments(ctx context.Context, in *pb.List
 }
 
 
+func (c *CommunityServer) CommunityMembers(ctx context.Context, in *pb.CommunityMembersRequest) (*pb.CommunityMembersResponse, error) {
+	resp, err := c.Community.GetCommunityMembers(in.ComunityId)
 
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
