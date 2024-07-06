@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserManagementClient interface {
+	CheckUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*GetUserByIdResponce, error)
 	CreateUser(ctx context.Context, in *CreateUsersRequest, opts ...grpc.CallOption) (*CreateUsersResponce, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponce, error)
@@ -36,6 +37,15 @@ type userManagementClient struct {
 
 func NewUserManagementClient(cc grpc.ClientConnInterface) UserManagementClient {
 	return &userManagementClient{cc}
+}
+
+func (c *userManagementClient) CheckUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, "/users.UserManagement/CheckUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userManagementClient) GetUserById(ctx context.Context, in *GetUserByIdRequest, opts ...grpc.CallOption) (*GetUserByIdResponce, error) {
@@ -96,6 +106,7 @@ func (c *userManagementClient) UpdateUserProfile(ctx context.Context, in *Update
 // All implementations must embed UnimplementedUserManagementServer
 // for forward compatibility
 type UserManagementServer interface {
+	CheckUser(context.Context, *UserRequest) (*UserResponse, error)
 	GetUserById(context.Context, *GetUserByIdRequest) (*GetUserByIdResponce, error)
 	CreateUser(context.Context, *CreateUsersRequest) (*CreateUsersResponce, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponce, error)
@@ -109,6 +120,9 @@ type UserManagementServer interface {
 type UnimplementedUserManagementServer struct {
 }
 
+func (UnimplementedUserManagementServer) CheckUser(context.Context, *UserRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckUser not implemented")
+}
 func (UnimplementedUserManagementServer) GetUserById(context.Context, *GetUserByIdRequest) (*GetUserByIdResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
@@ -138,6 +152,24 @@ type UnsafeUserManagementServer interface {
 
 func RegisterUserManagementServer(s grpc.ServiceRegistrar, srv UserManagementServer) {
 	s.RegisterService(&UserManagement_ServiceDesc, srv)
+}
+
+func _UserManagement_CheckUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserManagementServer).CheckUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/users.UserManagement/CheckUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserManagementServer).CheckUser(ctx, req.(*UserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserManagement_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -255,6 +287,10 @@ var UserManagement_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "users.UserManagement",
 	HandlerType: (*UserManagementServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CheckUser",
+			Handler:    _UserManagement_CheckUser_Handler,
+		},
 		{
 			MethodName: "GetUserById",
 			Handler:    _UserManagement_GetUserById_Handler,
